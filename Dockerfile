@@ -1,9 +1,8 @@
 FROM influxdb:2.7-alpine
-MAINTAINER Jacob Tomlinson <jacob@tom.linson.uk>
-
-RUN apk add --no-cache bash py-pip && rm -rf /var/cache/apk/*
-
-RUN pip --no-cache-dir install awscli
+RUN apk add --no-cache bash py3-pip python3-venv && \
+    python3 -m venv /venv && \
+    . /venv/bin/activate && \
+    pip install --no-cache-dir awscli
 
 COPY influxdb-to-s3.sh /usr/bin/influxdb-to-s3
 
