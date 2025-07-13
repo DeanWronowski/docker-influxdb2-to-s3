@@ -1,13 +1,13 @@
 FROM influxdb:2.7-alpine
 
-# 1) Install bash, python3, pip, busybox cron, and awscli (v1 via pip)
-RUN apk add --no-cache bash python3 py3-pip busybox-cron \
+# Install bash, Python 3 + pip, cron daemon, and AWS-CLI v1
+RUN apk add --no-cache bash python3 py3-pip dcron \
  && pip3 install --no-cache-dir awscli
 
-# 2) Copy your backup script
+# Copy & make your script executable
 COPY influxdb-to-s3.sh /usr/local/bin/influxdb-to-s3
 RUN chmod +x /usr/local/bin/influxdb-to-s3
 
-# 3) Entrypoint + default cron schedule
+# Use your script as entrypoint; default to daily at midnight
 ENTRYPOINT ["/usr/local/bin/influxdb-to-s3"]
 CMD ["cron", "0 0 * * *"]
