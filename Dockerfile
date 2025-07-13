@@ -1,14 +1,13 @@
 FROM influxdb:2.7-alpine
 
-RUN apk add --no-cache bash curl unzip \
- && curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip \
- && unzip /tmp/awscliv2.zip -d /tmp \
- && /tmp/aws/install \
- && rm -rf /tmp/awscliv2.zip /tmp/aws
+# 1) Install bash, python3, pip, busybox cron, and awscli (v1 via pip)
+RUN apk add --no-cache bash python3 py3-pip busybox-cron \
+ && pip3 install --no-cache-dir awscli
 
-# rest of your Dockerfile unchanged
+# 2) Copy your backup script
 COPY influxdb-to-s3.sh /usr/local/bin/influxdb-to-s3
 RUN chmod +x /usr/local/bin/influxdb-to-s3
 
+# 3) Entrypoint + default cron schedule
 ENTRYPOINT ["/usr/local/bin/influxdb-to-s3"]
 CMD ["cron", "0 0 * * *"]
